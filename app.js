@@ -5,14 +5,15 @@
  * - Each combined unit above 450 becomes one Legendary Soulstone Choice Chest.
  *
  * Legacy costs below are based on the community wiki's progression tables.
- * The unlock cost (20 Soulstones) is included in the cumulative Soulstone total.
+ * Legacy Soulstone spent amounts exclude the initial unlock cost, matching
+ * the progression example used for this calculator.
  * New-grade thresholds include the unlock cost, so ★1 starts at 40 total.
  */
 const COOKIE_RULES = {
   conversionRate: 1.2,
   threshold: 450,
   // Current legacy stage 0..10: base, ★1..★5, then ★1A..★5A.
-  legacySoulstonesSpent: [0, 40, 70, 120, 190, 290, 290, 290, 290, 290, 290],
+  legacySoulstonesSpent: [0, 20, 50, 100, 170, 270, 270, 270, 270, 270, 270],
   legacySoulcoresSpent:  [0,  0,  0,   0,   0,   0,  20,  50,  90, 140, 200],
   // Minimum cumulative converted Soulstones for new system: base, ★1..★6.
   newGradeThresholds: [0, 40, 80, 150, 250, 380, 540]
@@ -31,7 +32,11 @@ function calculateConversion(input, rules = COOKIE_RULES) {
   const stage = Math.max(0, Math.min(10, Number(input.grade) || 0));
   const spentSoulstones = rules.legacySoulstonesSpent[stage];
   const spentSoulcores = rules.legacySoulcoresSpent[stage];
-  const total = input.ownedSoulstones + spentSoulstones + input.ownedSoulcores + spentSoulcores;
+  // The single leftover-material field follows the selected stage: for an
+  // ascension stage it represents leftover Soulcores; otherwise Soulstones.
+  const ownedSoulstones = stage >= 6 ? 0 : input.ownedMaterial;
+  const ownedSoulcores = stage >= 6 ? input.ownedMaterial : 0;
+  const total = ownedSoulstones + spentSoulstones + ownedSoulcores + spentSoulcores;
   const soulstoneConversionBasis = Math.min(total, rules.threshold);
   const convertedSoulstones = Math.ceil(soulstoneConversionBasis * rules.conversionRate);
   const excess = Math.max(0, total - rules.threshold);
@@ -47,7 +52,7 @@ function calculateConversion(input, rules = COOKIE_RULES) {
   const remainingSoulstones = convertedSoulstones - finalGradeThreshold;
 
   return {
-    stage, spentSoulstones, spentSoulcores, total, soulstoneConversionBasis,
+    stage, ownedSoulstones, ownedSoulcores, spentSoulstones, spentSoulcores, total, soulstoneConversionBasis,
     convertedSoulstones, excess, chestCount: excess,
     maxAffordableGrade, previousGradeCap, finalGrade, remainingSoulstones
   };
@@ -72,9 +77,8 @@ function showResult(input, result) {
 
   const lines = [
     `현재 단계: ${stageLabel(result.stage)}`,
-    `현재 보유 영혼석: ${formatNumber(input.ownedSoulstones)}개`,
+    `현재 단계에 맞춰 입력한 남은 재료: ${formatNumber(input.ownedMaterial)}개 (${result.stage >= 6 ? "초월영혼석" : "영혼석"})`,
     `현재 단계까지 사용한 영혼석(누적): ${formatNumber(result.spentSoulstones)}개`,
-    `현재 보유 초월영혼석: ${formatNumber(input.ownedSoulcores)}개`,
     `현재 단계까지 사용한 초월영혼석(누적): ${formatNumber(result.spentSoulcores)}개`,
     `합산량: ${formatNumber(result.total)}개`,
     `120% 환산 대상: ${formatNumber(result.soulstoneConversionBasis)}개 → ${formatNumber(result.convertedSoulstones)}개 (소수점 올림)`,
@@ -126,8 +130,7 @@ if (hasDOM) {
     try {
       const input = {
         grade: Number(gradeInput.value),
-        ownedSoulstones: readNonNegativeInteger("ownedSoulstones"),
-        ownedSoulcores: readNonNegativeInteger("ownedSoulcores")
+        ownedMaterial: readNonNegativeInteger("ownedMaterial")
       };
       showResult(input, calculateConversion(input));
     } catch (error) {
