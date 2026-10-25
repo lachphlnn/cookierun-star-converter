@@ -6,10 +6,12 @@ assert.equal(zero.total, 0);
 assert.equal(zero.convertedSoulstones, 0);
 assert.equal(zero.finalGrade, 0);
 
-// Stage 5 is legacy ★5: 270 cumulative Soulstones, no Soulcores.
+// Stage 5 is legacy ★5: the slider amount is leftover Soulcores (0–20).
 const fiveStar = calculateConversion({ grade: 5, ownedMaterial: 10 });
 assert.equal(fiveStar.spentSoulstones, 270);
 assert.equal(fiveStar.spentSoulcores, 0);
+assert.equal(fiveStar.ownedSoulstones, 0);
+assert.equal(fiveStar.ownedSoulcores, 10);
 assert.equal(fiveStar.total, 280);
 assert.equal(fiveStar.convertedSoulstones, 336);
 assert.equal(fiveStar.finalGrade, 4); // ★4 needs 250; ★5 needs 380.
@@ -24,17 +26,17 @@ assert.equal(twoAscension.convertedSoulstones, 384);
 assert.equal(twoAscension.finalGrade, 5); // Existing stage cap and converted amount allow ★5.
 assert.equal(twoAscension.remainingSoulstones, 4);
 
-const overThreshold = calculateConversion({ grade: 5, ownedMaterial: 160 });
-assert.equal(overThreshold.total, 430);
-assert.equal(overThreshold.convertedSoulstones, 516);
-assert.equal(overThreshold.chestCount, 0);
-assert.equal(overThreshold.finalGrade, 5); // Existing ★5 caps the new grade at ★5.
-assert.equal(overThreshold.remainingSoulstones, 136);
+const overThreshold = calculateConversion({ grade: 9, ownedMaterial: 45 });
+assert.equal(overThreshold.total, 455);
+assert.equal(overThreshold.convertedSoulstones, 540);
+assert.equal(overThreshold.chestCount, 5);
+assert.equal(overThreshold.finalGrade, 6);
+assert.equal(overThreshold.remainingSoulstones, 0);
 
-const aboveThreshold = calculateConversion({ grade: 5, ownedMaterial: 185 });
-assert.equal(aboveThreshold.total, 455);
+const aboveThreshold = calculateConversion({ grade: 9, ownedMaterial: 60 });
+assert.equal(aboveThreshold.total, 470);
 assert.equal(aboveThreshold.convertedSoulstones, 540);
-assert.equal(aboveThreshold.chestCount, 5);
+assert.equal(aboveThreshold.chestCount, 20);
 
 
 // User example: legacy ★3 spent 100 Soulstones; 60 left means 160 total.

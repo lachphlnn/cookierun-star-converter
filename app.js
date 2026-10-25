@@ -25,10 +25,10 @@ const results = hasDOM ? document.getElementById("results") : null;
 const gradeButtons = hasDOM ? [...document.querySelectorAll("[data-grade]")] : [];
 
 // Maximum remaining materials available on the slider for each selected stage.
-// Normal grades use the next Soulstone promotion cost; ascension grades use
-// the next Soulcore promotion cost. The final stage uses the largest step cost.
+// Slider limits by selected grade. Legacy ★5 uses Soulcores (0–20), and
+// ascension stages use Soulcores as well.
 const MATERIAL_MAX_BY_STAGE = {
-  1: 30, 2: 50, 3: 70, 4: 100, 5: 100,
+  1: 30, 2: 50, 3: 70, 4: 100, 5: 20,
   6: 30, 7: 40, 8: 50, 9: 60, 10: 0
 };
 
@@ -40,10 +40,10 @@ function calculateConversion(input, rules = COOKIE_RULES) {
   const stage = Math.max(0, Math.min(10, Number(input.grade) || 0));
   const spentSoulstones = rules.legacySoulstonesSpent[stage];
   const spentSoulcores = rules.legacySoulcoresSpent[stage];
-  // The single leftover-material field follows the selected stage: for an
-  // ascension stage it represents leftover Soulcores; otherwise Soulstones.
-  const ownedSoulstones = stage >= 6 ? 0 : input.ownedMaterial;
-  const ownedSoulcores = stage >= 6 ? input.ownedMaterial : 0;
+  // The single leftover-material field represents Soulcores at legacy ★5 and
+  // all ascension stages; stages below ★5 use Soulstones.
+  const ownedSoulstones = stage >= 5 ? 0 : input.ownedMaterial;
+  const ownedSoulcores = stage >= 5 ? input.ownedMaterial : 0;
   const total = ownedSoulstones + spentSoulstones + ownedSoulcores + spentSoulcores;
   const soulstoneConversionBasis = Math.min(total, rules.threshold);
   const convertedSoulstones = Math.ceil(soulstoneConversionBasis * rules.conversionRate);
@@ -172,7 +172,7 @@ if (hasDOM) {
     materialDecrease.disabled = stage === 10;
     materialIncrease.disabled = stage === 10;
     materialMaxLabel.textContent = `최대 ${formatNumber(max)}개`;
-    materialUnit.textContent = stage >= 6 ? "· 초월영혼석" : "· 영혼석";
+    materialUnit.textContent = stage >= 5 ? "· 초월영혼석" : "· 영혼석";
     // Ascension ★5 is the final stage: no leftover material is selectable.
     setMaterialValue(stage === 10 ? 0 : materialSlider.value);
     if (stage === 10) {
