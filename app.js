@@ -75,26 +75,6 @@ function showResult(input, result) {
   document.getElementById("final-grade").textContent = newGradeLabel(result.finalGrade);
   document.getElementById("remaining").textContent = formatNumber(result.remainingSoulstones);
 
-  const lines = [
-    `현재 단계: ${stageLabel(result.stage)}`,
-    `현재 단계에 맞춰 입력한 남은 재료: ${formatNumber(input.ownedMaterial)}개 (${result.stage >= 6 ? "초월영혼석" : "영혼석"})`,
-    `현재 단계까지 사용한 영혼석(누적): ${formatNumber(result.spentSoulstones)}개`,
-    `현재 단계까지 사용한 초월영혼석(누적): ${formatNumber(result.spentSoulcores)}개`,
-    `합산량: ${formatNumber(result.total)}개`,
-    `120% 환산 대상: ${formatNumber(result.soulstoneConversionBasis)}개 → ${formatNumber(result.convertedSoulstones)}개 (소수점 올림)`,
-    `450개 초과분: ${formatNumber(result.excess)}개 → 레전더리 영혼석 선택 상자 ${formatNumber(result.chestCount)}개`,
-    `환산 재료로 가능한 최대 성급: ${newGradeLabel(result.maxAffordableGrade)}`,
-    `기존 달성 단계 기준 상한: ${newGradeLabel(result.previousGradeCap)}`,
-    `최종 성급: ${newGradeLabel(result.finalGrade)}`,
-    `최종 성급 기준 잔여 영혼석: ${formatNumber(result.remainingSoulstones)}개`
-  ];
-  const list = document.getElementById("breakdown");
-  list.replaceChildren();
-  for (const line of lines) {
-    const item = document.createElement("li");
-    item.textContent = line;
-    list.appendChild(item);
-  }
   results.hidden = false;
   results.scrollIntoView({ behavior: "smooth", block: "start" });
 }
