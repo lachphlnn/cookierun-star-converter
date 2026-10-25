@@ -11,101 +11,73 @@
   <header class="site-header">
     <div class="eyebrow">COOKIE RUN: KINGDOM</div>
     <h1>6성 체계 전환 계산기</h1>
-    <p>현재 보유 재료와 기존 투자량을 바탕으로 전환 재료를 추정합니다.</p>
+    <p>현재 단계와 남은 재료를 입력해 전환 후 성급과 재료를 계산합니다.</p>
   </header>
-
   <main>
-    <section class="notice" aria-label="중요 안내">
-      <strong>계산 범위 안내</strong>
-      <p>공식 공지에서 확인되는 환산 규칙만 자동 계산합니다. 쿠키별 6성 승급 필요량 표는 아직 검증된 값으로 등록되지 않아, 전환 후 성급과 잔여 영혼석은 임의로 추정하지 않습니다.</p>
-      <p>공식 공지의 전환 방식은 쿠키별로 다를 수 있으므로, 전환 규칙이 공식 확인된 쿠키만 선택하세요.</p>
+    <section class="notice" aria-label="계산 안내">
+      <strong>계산 방식</strong>
+      <p>쿠키 선택 없이 공통 규칙으로 계산합니다. 기존 단계까지 사용한 누적 영혼석·초월영혼석은 자동으로 더하고, 입력하는 보유량은 현재 승급/초월 후 남은 수량만 입력하세요.</p>
     </section>
-
     <section class="panel">
-      <h2>1. 쿠키와 현재 상태</h2>
+      <h2>1. 현재 단계와 보유 재료</h2>
       <form id="calculator-form">
         <div class="field">
-          <label for="cookie">쿠키</label>
-          <select id="cookie" name="cookie">
-            <option value="wind_archer">바람궁수 쿠키</option>
-            <option value="moonlight">달빛술사 쿠키</option>
-          </select>
-          <small id="cookie-note">2026년 7월 2일 공식 공지 기준</small>
+          <span class="field-label">현재 달성 단계</span>
+          <input id="grade" name="grade" type="hidden" value="5">
+          <div class="star-picker" role="group" aria-label="기존 달성 단계 선택">
+            <div class="star-buttons">
+              <button type="button" class="star-button" data-grade="1" aria-label="1성" aria-pressed="false">★</button>
+              <button type="button" class="star-button" data-grade="2" aria-label="2성" aria-pressed="false">★</button>
+              <button type="button" class="star-button" data-grade="3" aria-label="3성" aria-pressed="false">★</button>
+              <button type="button" class="star-button" data-grade="4" aria-label="4성" aria-pressed="false">★</button>
+              <button type="button" class="star-button" data-grade="5" aria-label="5성" aria-pressed="false">★</button>
+              <button type="button" class="star-button" data-grade="6" aria-label="1초월" aria-pressed="false">★</button>
+              <button type="button" class="star-button" data-grade="7" aria-label="2초월" aria-pressed="false">★</button>
+              <button type="button" class="star-button" data-grade="8" aria-label="3초월" aria-pressed="false">★</button>
+              <button type="button" class="star-button" data-grade="9" aria-label="4초월" aria-pressed="false">★</button>
+              <button type="button" class="star-button" data-grade="10" aria-label="5초월" aria-pressed="false">★</button>
+            </div>
+            <div class="grade-caption"><strong id="grade-label">★5</strong><span>별을 눌러 단계를 선택하세요. 7번째 별은 2초월입니다.</span></div>
+          </div>
         </div>
-
-        <div class="field">
-          <label for="grade">현재 달성 단계</label>
-          <select id="grade" name="grade">
-            <option value="0">기본 획득 상태</option>
-            <option value="1">1성</option>
-            <option value="2">2성</option>
-            <option value="3">3성</option>
-            <option value="4">4성</option>
-            <option value="5" selected>5성</option>
-            <option value="6">1초월</option>
-            <option value="7">2초월</option>
-            <option value="8">3초월</option>
-            <option value="9">4초월</option>
-            <option value="10">5초월</option>
-          </select>
-          <small>기존 5성 + 5초월 체계 기준의 달성 단계입니다.</small>
-        </div>
-
         <div class="grid">
           <div class="field">
-            <label for="ownedSoulstones">현재 보유 영혼석</label>
+            <label for="ownedSoulstones">현재 남은 영혼석</label>
             <input id="ownedSoulstones" name="ownedSoulstones" type="number" min="0" step="1" value="0" required>
+            <small>현재 단계까지 승급에 쓴 수량은 자동 합산됩니다.</small>
           </div>
           <div class="field">
-            <label for="spentSoulstones">승급에 사용한 영혼석 합계</label>
-            <input id="spentSoulstones" name="spentSoulstones" type="number" min="0" step="1" value="0" required>
-            <small>게임 기록 등으로 확인 가능한 값만 입력하세요.</small>
-          </div>
-          <div class="field">
-            <label for="ownedSoulcores">현재 보유 초월영혼석</label>
+            <label for="ownedSoulcores">현재 남은 초월영혼석</label>
             <input id="ownedSoulcores" name="ownedSoulcores" type="number" min="0" step="1" value="0" required>
-          </div>
-          <div class="field">
-            <label for="spentSoulcores">초월에 사용한 초월영혼석 합계</label>
-            <input id="spentSoulcores" name="spentSoulcores" type="number" min="0" step="1" value="0" required>
-            <small>초월에 실제로 사용한 수량입니다.</small>
+            <small>현재 단계까지 초월에 쓴 수량은 자동 합산됩니다.</small>
           </div>
         </div>
-
-        <button type="submit" class="primary">환산 재료 계산</button>
-        <button type="reset" class="secondary">입력 초기화</button>
+        <button type="submit" class="primary">전환 결과 계산</button>
+        <button type="reset" class="secondary">초기화</button>
       </form>
     </section>
-
     <section id="results" class="panel results" aria-live="polite" hidden>
       <h2>2. 계산 결과</h2>
       <div class="result-grid">
-        <div class="result-card"><span>환산 전 재료 합계</span><strong id="total">—</strong><small>영혼석 + 초월영혼석 + 과거 사용량</small></div>
-        <div class="result-card"><span>120% 환산 영혼석</span><strong id="converted">—</strong><small>소수점 올림 적용</small></div>
-        <div class="result-card"><span>선택 상자 환산 대상</span><strong id="chests">—</strong><small>공식 공지의 450개 초과분 기준</small></div>
+        <div class="result-card"><span>환산 전 재료 합계</span><strong id="total">—</strong><small>보유량 + 과거 사용량</small></div>
+        <div class="result-card"><span>환산 영혼석</span><strong id="converted">—</strong><small>최대 450개 × 120%, 소수점 올림</small></div>
+        <div class="result-card"><span>선택 상자</span><strong id="chests">—</strong><small>합산량 450개 초과분</small></div>
+        <div class="result-card"><span>예상 최종 성급</span><strong id="final-grade">—</strong><small>기존 단계 상한과 환산 가능 단계 중 낮은 값</small></div>
+        <div class="result-card"><span>잔여 영혼석</span><strong id="remaining">—</strong><small>예상 최종 성급의 누적 필요량 차감 후</small></div>
       </div>
-      <div class="result-explanation">
-        <h3>계산 내역</h3>
-        <ul id="breakdown"></ul>
-      </div>
-      <div class="warning" id="grade-warning">
-        전환 후 성급과 남는 영혼석은 6성별 승급 필요량을 검증한 뒤 계산할 수 있습니다. 이 초기 버전은 해당 수량을 임의로 가정하지 않습니다.
-      </div>
+      <div class="result-explanation"><h3>계산 내역</h3><ul id="breakdown"></ul></div>
     </section>
-
     <section class="panel">
-      <h2>3. 공식 자료와 계산 규칙</h2>
+      <h2>3. 적용한 자료와 가정</h2>
       <ul class="sources">
-        <li><a href="https://hub.cookierun-kingdom.com/ko/news/updates/july-2-update-notice" target="_blank" rel="noopener noreferrer">공식 공지: 2026년 7월 2일 업데이트 — 바람궁수 쿠키</a></li>
-        <li><a href="https://hub.cookierun-kingdom.com/news/updates/october-21-update-notice" target="_blank" rel="noopener noreferrer">공식 공지: 2026년 10월 21일 업데이트 — 달빛술사 쿠키</a></li>
+        <li><a href="https://hub.cookierun-kingdom.com/ko/news/updates/july-2-update-notice" target="_blank" rel="noopener noreferrer">공식 공지: 바람궁수 쿠키 전환 규칙</a></li>
+        <li><a href="https://hub.cookierun-kingdom.com/news/updates/october-21-update-notice" target="_blank" rel="noopener noreferrer">공식 공지: 달빛술사 쿠키 전환 규칙</a></li>
+        <li><a href="https://cookierun.wiki/w/Ascension" target="_blank" rel="noopener noreferrer">쿠키런 위키: 승급·초월 및 6성 필요 영혼석 표</a></li>
       </ul>
-      <p class="fine-print">공식 공지에는 현재 보유량과 과거 승급·초월에 사용한 영혼석/초월영혼석의 합산, 120% 환산, 소수점 올림, 합산량 450개 초과분의 선택 상자 전환, 기존 달성 단계와 환산 재료로 가능한 단계 중 낮은 단계 적용이 명시되어 있습니다. 쿠키별 세부 승급 필요량은 공식적으로 확인한 뒤 별도로 추가해야 합니다.</p>
+      <p class="fine-print">공식 공지의 공통 규칙은 보유량과 과거 사용량 합산, 120% 환산, 소수점 올림, 합산량 450개 초과분의 선택 상자 전환입니다. 단계별 누적 사용량과 6성 성급별 필요량은 커뮤니티 위키의 표를 바탕으로 적용했으며, 승급 해금 비용 20개도 누적 영혼석에 포함했습니다. 게임 내 실제 결과와 차이가 있으면 게임 내 안내를 우선해 주세요.</p>
     </section>
   </main>
-
-  <footer>
-    <p>팬 제작 비공식 도구 · 데브시스터즈와 무관</p>
-  </footer>
+  <footer><p>팬 제작 비공식 도구 · 데브시스터즈와 무관</p></footer>
   <script src="app.js"></script>
 </body>
 </html>

@@ -1,28 +1,15 @@
 {
-  "schemaVersion": 1,
-  "description": "Only official conversion rules verified from update notices are included. Promotion thresholds are intentionally omitted until verified.",
-  "cookies": [
-    {
-      "id": "wind_archer",
-      "nameKo": "바람궁수 쿠키",
-      "status": "official_conversion_rule_verified",
-      "officialNotice": "https://hub.cookierun-kingdom.com/ko/news/updates/july-2-update-notice",
-      "conversionRate": 1.2,
-      "rounding": "ceil",
-      "choiceChestThreshold": 450,
-      "choiceChestKinds": 9,
-      "gradeThresholds": null
-    },
-    {
-      "id": "moonlight",
-      "nameKo": "달빛술사 쿠키",
-      "status": "official_conversion_rule_verified",
-      "officialNotice": "https://hub.cookierun-kingdom.com/news/updates/october-21-update-notice",
-      "conversionRate": 1.2,
-      "rounding": "ceil",
-      "choiceChestThreshold": 450,
-      "choiceChestKinds": 10,
-      "gradeThresholds": null
-    }
+  "schemaVersion": 2,
+  "description": "Shared conversion rules. Official notices define the 120% conversion and 450-unit threshold; progression thresholds are based on the community wiki and should be checked against the in-game result.",
+  "legacySoulstonesSpentByStage": [0, 40, 70, 120, 190, 290, 290, 290, 290, 290, 290],
+  "legacySoulcoresSpentByStage": [0, 0, 0, 0, 0, 0, 20, 50, 90, 140, 200],
+  "newGradeCumulativeSoulstones": [0, 40, 80, 150, 250, 380, 540],
+  "conversionRate": 1.2,
+  "rounding": "ceil",
+  "choiceChestThreshold": 450,
+  "notes": [
+    "Stage 1-5 represent legacy ★1-★5; stage 6-10 represent legacy ★1A-★5A.",
+    "Cumulative legacy Soulstone costs include the 20 Soulstone unlock cost.",
+    "New-grade thresholds include unlock cost: ★1 40, ★2 80, ★3 150, ★4 250, ★5 380, ★6 540."
   ]
 }

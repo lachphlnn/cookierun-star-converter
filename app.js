@@ -1,97 +1,89 @@
-/*
- * CookieRun: Kingdom 6-Star Conversion Calculator
- * Official rules currently encoded:
- * - Sum currently owned Soulstones + currently owned Soulcores
- *   + Soulstones previously spent on promotion/ascension
- *   + Soulcores previously spent on promotion/ascension.
- * - Convert total at 120%; round fractional values up.
- * - If the pre-conversion combined amount exceeds 450, each unit above
- *   450 is converted to one Legendary Soulstone Choice Chest.
+/* CookieRun: Kingdom 6-Star Conversion Calculator
+ * Conversion rules from the official update notices:
+ * - Add leftover Soulstones/Soulcores to the amounts previously spent.
+ * - Convert up to 450 combined units at 120%, rounding fractions up.
+ * - Each combined unit above 450 becomes one Legendary Soulstone Choice Chest.
  *
- * IMPORTANT:
- * Official notice does not publish the full per-grade Soulstone threshold
- * table in the cited conversion section. Do not guess grade/leftover results.
+ * Legacy costs below are based on the community wiki's progression tables.
+ * The unlock cost (20 Soulstones) is included in the cumulative Soulstone total.
+ * New-grade thresholds include the unlock cost, so ★1 starts at 40 total.
  */
 const COOKIE_RULES = {
-  wind_archer: {
-    name: "바람궁수 쿠키",
-    officialNotice: "https://hub.cookierun-kingdom.com/ko/news/updates/july-2-update-notice",
-    choiceChestKinds: 9,
-    conversionRate: 1.2,
-    rounding: "ceil",
-    threshold: 450,
-    gradeThresholdsVerified: false
-  },
-  moonlight: {
-    name: "달빛술사 쿠키",
-    officialNotice: "https://hub.cookierun-kingdom.com/news/updates/october-21-update-notice",
-    choiceChestKinds: 10,
-    conversionRate: 1.2,
-    rounding: "ceil",
-    threshold: 450,
-    gradeThresholdsVerified: false
-  }
+  conversionRate: 1.2,
+  threshold: 450,
+  // Current legacy stage 0..10: base, ★1..★5, then ★1A..★5A.
+  legacySoulstonesSpent: [0, 40, 70, 120, 190, 290, 290, 290, 290, 290, 290],
+  legacySoulcoresSpent:  [0,  0,  0,   0,   0,   0,  20,  50,  90, 140, 200],
+  // Minimum cumulative converted Soulstones for new system: base, ★1..★6.
+  newGradeThresholds: [0, 40, 80, 150, 250, 380, 540]
 };
 
 const hasDOM = typeof document !== "undefined";
 const form = hasDOM ? document.getElementById("calculator-form") : null;
 const results = hasDOM ? document.getElementById("results") : null;
-const cookieSelect = hasDOM ? document.getElementById("cookie") : null;
-const cookieNote = hasDOM ? document.getElementById("cookie-note") : null;
-
-function readNonNegativeInteger(id) {
-  const raw = document.getElementById(id).value.trim();
-  const value = Number(raw);
-  if (raw === "" || !Number.isSafeInteger(value) || value < 0) {
-    throw new Error("모든 재료 수량은 0 이상의 정수로 입력해 주세요.");
-  }
-  return value;
-}
+const gradeButtons = hasDOM ? [...document.querySelectorAll("[data-grade]")] : [];
 
 function formatNumber(value) {
   return new Intl.NumberFormat("ko-KR").format(value);
 }
 
-function calculateConversion(input, rule) {
-  const total =
-    input.ownedSoulstones +
-    input.spentSoulstones +
-    input.ownedSoulcores +
-    input.spentSoulcores;
-
-  // The official notice describes units above 450 as choice chests.
-  // Therefore, only the first 450 units enter the 120% Soulstone conversion.
-  const soulstoneConversionBasis = Math.min(total, rule.threshold);
-  const convertedSoulstones = Math.ceil(soulstoneConversionBasis * rule.conversionRate);
-  const excess = Math.max(0, total - rule.threshold);
+function calculateConversion(input, rules = COOKIE_RULES) {
+  const stage = Math.max(0, Math.min(10, Number(input.grade) || 0));
+  const spentSoulstones = rules.legacySoulstonesSpent[stage];
+  const spentSoulcores = rules.legacySoulcoresSpent[stage];
+  const total = input.ownedSoulstones + spentSoulstones + input.ownedSoulcores + spentSoulcores;
+  const soulstoneConversionBasis = Math.min(total, rules.threshold);
+  const convertedSoulstones = Math.ceil(soulstoneConversionBasis * rules.conversionRate);
+  const excess = Math.max(0, total - rules.threshold);
+  const maxAffordableGrade = rules.newGradeThresholds.reduce(
+    (grade, threshold, index) => convertedSoulstones >= threshold ? index : grade, 0
+  );
+  // Legacy ★1..★5 map to the corresponding new grade; any ascension stage
+  // caps the new grade at ★6. The final grade is the lower of that cap and
+  // the grade affordable with converted Soulstones.
+  const previousGradeCap = stage === 0 ? 0 : Math.min(stage, 6);
+  const finalGrade = Math.min(previousGradeCap, maxAffordableGrade);
+  const finalGradeThreshold = rules.newGradeThresholds[finalGrade];
+  const remainingSoulstones = convertedSoulstones - finalGradeThreshold;
 
   return {
-    total,
-    soulstoneConversionBasis,
-    convertedSoulstones,
-    excess,
-    chestCount: excess,
-    choiceChestKinds: rule.choiceChestKinds
+    stage, spentSoulstones, spentSoulcores, total, soulstoneConversionBasis,
+    convertedSoulstones, excess, chestCount: excess,
+    maxAffordableGrade, previousGradeCap, finalGrade, remainingSoulstones
   };
 }
 
-function showResult(input, result, rule) {
+function stageLabel(stage) {
+  if (stage === 0) return "기본 획득";
+  if (stage <= 5) return `★${stage}`;
+  return `★${stage - 5} 초월`;
+}
+
+function newGradeLabel(grade) {
+  return grade === 0 ? "기본 획득 상태" : `★${grade}`;
+}
+
+function showResult(input, result) {
   document.getElementById("total").textContent = formatNumber(result.total);
   document.getElementById("converted").textContent = formatNumber(result.convertedSoulstones);
   document.getElementById("chests").textContent = formatNumber(result.chestCount);
+  document.getElementById("final-grade").textContent = newGradeLabel(result.finalGrade);
+  document.getElementById("remaining").textContent = formatNumber(result.remainingSoulstones);
 
   const lines = [
+    `현재 단계: ${stageLabel(result.stage)}`,
     `현재 보유 영혼석: ${formatNumber(input.ownedSoulstones)}개`,
-    `과거 승급에 사용한 영혼석: ${formatNumber(input.spentSoulstones)}개`,
+    `현재 단계까지 사용한 영혼석(누적): ${formatNumber(result.spentSoulstones)}개`,
     `현재 보유 초월영혼석: ${formatNumber(input.ownedSoulcores)}개`,
-    `과거 초월에 사용한 초월영혼석: ${formatNumber(input.spentSoulcores)}개`,
+    `현재 단계까지 사용한 초월영혼석(누적): ${formatNumber(result.spentSoulcores)}개`,
     `합산량: ${formatNumber(result.total)}개`,
-    `영혼석 환산 대상: min(${formatNumber(result.total)}, 450) = ${formatNumber(result.soulstoneConversionBasis)}개`,
-    `120% 환산: ${formatNumber(result.soulstoneConversionBasis)} × 1.2 = ${formatNumber(result.soulstoneConversionBasis * 1.2)} → 올림 ${formatNumber(result.convertedSoulstones)}개`,
-    `450개 초과분: max(0, ${formatNumber(result.total)} − 450) = ${formatNumber(result.excess)}개`,
-    `선택 상자 종류: ${rule.choiceChestKinds}종 레전더리 영혼석 선택 상자`
+    `120% 환산 대상: ${formatNumber(result.soulstoneConversionBasis)}개 → ${formatNumber(result.convertedSoulstones)}개 (소수점 올림)`,
+    `450개 초과분: ${formatNumber(result.excess)}개 → 레전더리 영혼석 선택 상자 ${formatNumber(result.chestCount)}개`,
+    `환산 재료로 가능한 최대 성급: ${newGradeLabel(result.maxAffordableGrade)}`,
+    `기존 달성 단계 기준 상한: ${newGradeLabel(result.previousGradeCap)}`,
+    `최종 성급: ${newGradeLabel(result.finalGrade)}`,
+    `최종 성급 기준 잔여 영혼석: ${formatNumber(result.remainingSoulstones)}개`
   ];
-
   const list = document.getElementById("breakdown");
   list.replaceChildren();
   for (const line of lines) {
@@ -104,35 +96,46 @@ function showResult(input, result, rule) {
 }
 
 if (hasDOM) {
-cookieSelect.addEventListener("change", () => {
-  const rule = COOKIE_RULES[cookieSelect.value];
-  cookieNote.textContent = rule.name + " · 공식 환산 규칙 확인";
-});
-
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  try {
-    const rule = COOKIE_RULES[cookieSelect.value];
-    const input = {
-      grade: Number(document.getElementById("grade").value),
-      ownedSoulstones: readNonNegativeInteger("ownedSoulstones"),
-      spentSoulstones: readNonNegativeInteger("spentSoulstones"),
-      ownedSoulcores: readNonNegativeInteger("ownedSoulcores"),
-      spentSoulcores: readNonNegativeInteger("spentSoulcores")
-    };
-    const result = calculateConversion(input, rule);
-    showResult(input, result, rule);
-  } catch (error) {
-    window.alert(error.message || "입력값을 확인해 주세요.");
+  const gradeInput = document.getElementById("grade");
+  function selectGrade(value) {
+    gradeInput.value = String(value);
+    gradeButtons.forEach((button) => {
+      const selected = Number(button.dataset.grade) === value;
+      button.classList.toggle("selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+    document.getElementById("grade-label").textContent = stageLabel(value);
   }
-});
+  gradeButtons.forEach((button) => button.addEventListener("click", () => selectGrade(Number(button.dataset.grade))));
+  selectGrade(Number(gradeInput.value));
 
-form.addEventListener("reset", () => {
-  results.hidden = true;
-});
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    try {
+      const input = {
+        grade: Number(gradeInput.value),
+        ownedSoulstones: readNonNegativeInteger("ownedSoulstones"),
+        ownedSoulcores: readNonNegativeInteger("ownedSoulcores")
+      };
+      showResult(input, calculateConversion(input));
+    } catch (error) {
+      window.alert(error.message || "입력값을 확인해 주세요.");
+    }
+  });
+  form.addEventListener("reset", () => {
+    window.setTimeout(() => { selectGrade(5); results.hidden = true; }, 0);
+  });
 }
 
-/* Export calculation helpers for Node-based tests, if required. */
+function readNonNegativeInteger(id) {
+  const raw = document.getElementById(id).value.trim();
+  const value = Number(raw);
+  if (raw === "" || !Number.isSafeInteger(value) || value < 0) {
+    throw new Error("보유 재료는 0 이상의 정수로 입력해 주세요.");
+  }
+  return value;
+}
+
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { COOKIE_RULES, calculateConversion };
+  module.exports = { COOKIE_RULES, calculateConversion, stageLabel };
 }
