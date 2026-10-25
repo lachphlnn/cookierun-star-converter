@@ -73,12 +73,24 @@ function showResult(input, result) {
 
   const starContainer = document.getElementById("final-grade-stars");
   starContainer.replaceChildren();
-  for (let grade = 1; grade <= 6; grade += 1) {
-    const star = document.createElement("img");
-    star.src = `assets/${grade <= result.finalGrade ? "star-normal.png" : "star-empty.png"}`;
-    star.alt = "";
-    star.draggable = false;
-    starContainer.appendChild(star);
+  starContainer.classList.toggle("is-six-star", result.finalGrade === 6);
+  if (result.finalGrade === 6) {
+    // At ★6, show the supplied full ascension sprite instead of individual stars.
+    const sprite = document.createElement("img");
+    sprite.src = "assets/six-star-sprite.png";
+    sprite.alt = "6성 초월 스프라이트";
+    sprite.className = "six-star-sprite";
+    sprite.draggable = false;
+    starContainer.appendChild(sprite);
+  } else {
+    // Keep the existing individual-star display for all results through ★5.
+    for (let grade = 1; grade <= 6; grade += 1) {
+      const star = document.createElement("img");
+      star.src = `assets/${grade <= result.finalGrade ? "star-normal.png" : "star-empty.png"}`;
+      star.alt = "";
+      star.draggable = false;
+      starContainer.appendChild(star);
+    }
   }
   const finalGradeLabel = document.getElementById("final-grade-label");
   finalGradeLabel.textContent = newGradeLabel(result.finalGrade);
@@ -164,8 +176,10 @@ if (hasDOM) {
 
 function readNonNegativeInteger(id) {
   const raw = document.getElementById(id).value.trim();
+  // An empty field means zero remaining materials.
+  if (raw === "") return 0;
   const value = Number(raw);
-  if (raw === "" || !Number.isSafeInteger(value) || value < 0) {
+  if (!Number.isSafeInteger(value) || value < 0) {
     throw new Error("보유 재료는 0 이상의 정수로 입력해 주세요.");
   }
   return value;
