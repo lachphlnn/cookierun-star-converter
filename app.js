@@ -100,9 +100,11 @@ if (hasDOM) {
   function selectGrade(value) {
     gradeInput.value = String(value);
     gradeButtons.forEach((button) => {
-      const selected = Number(button.dataset.grade) === value;
+      const buttonGrade = Number(button.dataset.grade);
+      const selected = buttonGrade <= value;
       button.classList.toggle("selected", selected);
-      button.setAttribute("aria-pressed", String(selected));
+      button.classList.toggle("current", buttonGrade === value);
+      button.setAttribute("aria-pressed", String(buttonGrade === value));
     });
     document.getElementById("grade-label").textContent = stageLabel(value);
   }
