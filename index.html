@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#6846c7">
   <title>쿠키런: 킹덤 6성 전환 계산기</title>
-  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
   <header class="site-header">
@@ -57,11 +57,19 @@
     <section id="results" class="panel results" hidden aria-live="polite">
       <h2>예상 전환 결과</h2>
       <div class="result-grid">
-        <div class="result-card"><span>전환 대상 합산량</span><strong id="total">0</strong><span>개</span></div>
-        <div class="result-card"><span>환산 후 영혼석</span><strong id="converted">0</strong><span>개</span></div>
-        <div class="result-card"><span>선택 상자</span><strong id="chests">0</strong><span>개</span></div>
-        <div class="result-card"><span>예상 최종 성급</span><strong id="final-grade">기본 획득 상태</strong></div>
-        <div class="result-card"><span>최종 성급 기준 잔여 영혼석</span><strong id="remaining">0</strong><span>개</span></div>
+        <div class="result-card chest-card"><span>선택 상자</span><strong id="chests">0개</strong></div>
+        <div class="result-card grade-card">
+          <span>예상 최종 성급</span>
+          <div id="final-grade-stars" class="result-stars" role="img" aria-label="예상 최종 성급"></div>
+          <strong id="final-grade-label" class="visually-hidden">기본 획득 상태</strong>
+        </div>
+        <div class="result-card progress-card">
+          <span id="progress-title">다음 성급까지 진행도</span>
+          <div class="progress-track" role="progressbar" aria-labelledby="progress-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="grade-progress">
+            <div class="progress-fill" id="grade-progress-fill"></div>
+          </div>
+          <div class="progress-meta"><strong id="progress-percent">0%</strong><span id="progress-needed">다음 성급까지 40개 필요</span></div>
+        </div>
       </div>
     </section>
 
@@ -77,6 +85,6 @@
     </section>
   </main>
   <footer>팬 제작 비공식 도구 · 데브시스터즈와 제휴·승인 관계가 없습니다.</footer>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>

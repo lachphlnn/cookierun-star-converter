@@ -69,11 +69,43 @@ function newGradeLabel(grade) {
 }
 
 function showResult(input, result) {
-  document.getElementById("total").textContent = formatNumber(result.total);
-  document.getElementById("converted").textContent = formatNumber(result.convertedSoulstones);
-  document.getElementById("chests").textContent = formatNumber(result.chestCount);
-  document.getElementById("final-grade").textContent = newGradeLabel(result.finalGrade);
-  document.getElementById("remaining").textContent = formatNumber(result.remainingSoulstones);
+  document.getElementById("chests").textContent = `${formatNumber(result.chestCount)}개`;
+
+  const starContainer = document.getElementById("final-grade-stars");
+  starContainer.replaceChildren();
+  for (let grade = 1; grade <= 6; grade += 1) {
+    const star = document.createElement("img");
+    star.src = `assets/${grade <= result.finalGrade ? "star-normal.png" : "star-empty.png"}`;
+    star.alt = "";
+    star.draggable = false;
+    starContainer.appendChild(star);
+  }
+  const finalGradeLabel = document.getElementById("final-grade-label");
+  finalGradeLabel.textContent = newGradeLabel(result.finalGrade);
+  starContainer.setAttribute("aria-label", `예상 최종 성급 ${newGradeLabel(result.finalGrade)}`);
+
+  const thresholds = COOKIE_RULES.newGradeThresholds;
+  const currentThreshold = thresholds[result.finalGrade];
+  const nextGrade = Math.min(result.finalGrade + 1, thresholds.length - 1);
+  const nextThreshold = thresholds[nextGrade];
+  const isMaxGrade = result.finalGrade >= thresholds.length - 1;
+  const progress = isMaxGrade
+    ? 100
+    : Math.max(0, Math.min(100, ((result.convertedSoulstones - currentThreshold) / (nextThreshold - currentThreshold)) * 100));
+  const needed = isMaxGrade ? 0 : Math.max(0, nextThreshold - result.convertedSoulstones);
+
+  const progressBar = document.getElementById("grade-progress");
+  progressBar.setAttribute("aria-valuenow", String(Math.round(progress)));
+  document.getElementById("grade-progress-fill").style.width = `${progress}%`;
+  document.getElementById("progress-percent").textContent = isMaxGrade ? "최고 성급" : `${Math.round(progress)}%`;
+  document.getElementById("progress-needed").textContent = isMaxGrade
+    ? "더 높은 성급이 없습니다."
+    : needed === 0
+      ? "다음 성급 기준을 충족했어요."
+      : `다음 성급까지 ${formatNumber(needed)}개 필요`;
+  document.getElementById("progress-title").textContent = isMaxGrade
+    ? "성급 진행도"
+    : `★${nextGrade}까지 진행도`;
 
   results.hidden = false;
   results.scrollIntoView({ behavior: "smooth", block: "start" });
