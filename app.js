@@ -89,6 +89,14 @@ if (hasDOM) {
       button.classList.toggle("selected", selected);
       button.classList.toggle("current", buttonGrade === value);
       button.setAttribute("aria-pressed", String(buttonGrade === value));
+      const starImage = button.querySelector("img");
+      if (starImage) {
+        const imageName = selected
+          ? (buttonGrade <= 5 ? "star-normal.png" : "star-ascension.png")
+          : "star-empty.png";
+        starImage.src = `assets/${imageName}`;
+        starImage.alt = "";
+      }
     });
     document.getElementById("grade-label").textContent = stageLabel(value);
   }
