@@ -106,7 +106,17 @@ if (hasDOM) {
     });
     document.getElementById("grade-label").textContent = stageLabel(value);
   }
-  gradeButtons.forEach((button) => button.addEventListener("click", () => selectGrade(Number(button.dataset.grade))));
+  // Delegate clicks from the star picker so taps/clicks continue to work even
+  // if the button markup is later rearranged.
+  const starPicker = document.querySelector(".star-picker");
+  if (starPicker) {
+    starPicker.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-grade]");
+      if (!button || !starPicker.contains(button)) return;
+      event.preventDefault();
+      selectGrade(Number(button.dataset.grade));
+    });
+  }
   selectGrade(Number(gradeInput.value));
 
   form.addEventListener("submit", (event) => {
