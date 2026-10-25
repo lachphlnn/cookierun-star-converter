@@ -1,0 +1,90 @@
+* { box-sizing: border-box; }
+:root {
+  color-scheme: light;
+  --ink: #28233a;
+  --muted: #716b80;
+  --line: #e5e0ef;
+  --paper: #ffffff;
+  --page: #f7f5fb;
+  --accent: #6846c7;
+  --accent-dark: #4b2fa0;
+  --notice: #fff8e7;
+  --notice-line: #e7c86d;
+}
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.55;
+}
+.site-header {
+  padding: 42px 20px 34px;
+  text-align: center;
+  background: linear-gradient(135deg, #312052, #6846c7);
+  color: white;
+}
+.eyebrow { font-size: .78rem; letter-spacing: .18em; opacity: .8; font-weight: 700; }
+h1 { margin: 8px 0; font-size: clamp(1.8rem, 5vw, 2.7rem); }
+.site-header p { max-width: 620px; margin: 0 auto; color: #eee7ff; }
+main { width: min(900px, calc(100% - 28px)); margin: 24px auto 48px; }
+.panel, .notice {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: clamp(18px, 3vw, 28px);
+  margin-bottom: 18px;
+  box-shadow: 0 8px 26px rgba(46, 30, 83, .04);
+}
+.notice { background: var(--notice); border-color: var(--notice-line); }
+.notice p { margin-bottom: 0; }
+h2 { margin: 0 0 20px; font-size: 1.25rem; }
+h3 { margin: 0 0 10px; font-size: 1rem; }
+.field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 17px; }
+label { font-weight: 700; }
+input, select {
+  width: 100%; min-height: 45px; border: 1px solid #d7d0e5;
+  border-radius: 10px; padding: 10px 12px; background: #fff; color: var(--ink);
+  font: inherit;
+}
+input:focus, select:focus { outline: 3px solid #d8cbff; border-color: var(--accent); }
+small, .fine-print { color: var(--muted); font-size: .86rem; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+button {
+  border: 0; border-radius: 10px; padding: 12px 18px; font: inherit; font-weight: 700;
+  cursor: pointer; margin: 4px 8px 0 0;
+}
+.primary { background: var(--accent); color: white; }
+.primary:hover { background: var(--accent-dark); }
+.secondary { background: #eeeaf6; color: var(--ink); }
+.results { border-color: #c7b9f5; }
+.result-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.result-card { padding: 16px; border-radius: 12px; background: #f7f4ff; display: flex; flex-direction: column; gap: 6px; }
+.result-card span { color: var(--muted); font-size: .88rem; }
+.result-card strong { font-size: clamp(1.4rem, 4vw, 2rem); overflow-wrap: anywhere; }
+.result-explanation { margin-top: 22px; }
+.result-explanation ul { padding-left: 20px; }
+.warning { padding: 14px; border-radius: 10px; background: #fff8e7; border: 1px solid var(--notice-line); }
+.sources { padding-left: 20px; }
+a { color: var(--accent-dark); }
+footer { text-align: center; padding: 10px 20px 30px; color: var(--muted); font-size: .85rem; }
+@media (max-width: 620px) {
+  .grid, .result-grid { grid-template-columns: 1fr; }
+  .site-header { padding: 32px 16px; }
+  button { width: 100%; margin-right: 0; }
+}
+.field-label { font-weight: 700; }
+.star-picker { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: #fcfbff; }
+.star-buttons { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; }
+.star-button { margin: 0; padding: 8px 0; min-width: 0; background: #eeebf4; color: #c5bfd3; font-size: clamp(1rem, 3vw, 1.7rem); line-height: 1.3; transition: background .15s ease, color .15s ease, transform .15s ease; }
+.star-button:hover { transform: translateY(-2px); }
+.star-button.selected { background: #6846c7; color: #fff0a8; }
+.star-button:focus-visible { outline: 3px solid #d8cbff; outline-offset: 2px; }
+.grade-caption { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.grade-caption strong { color: var(--accent-dark); font-size: 1.05rem; }
+.grade-caption span { color: var(--muted); font-size: .86rem; }
+@media (max-width: 480px) {
+  .star-picker { padding: 8px; }
+  .star-buttons { gap: 3px; }
+  .star-button { padding: 7px 0; border-radius: 7px; }
+}
