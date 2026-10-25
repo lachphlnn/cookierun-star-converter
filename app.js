@@ -29,7 +29,7 @@ const gradeButtons = hasDOM ? [...document.querySelectorAll("[data-grade]")] : [
 // the next Soulcore promotion cost. The final stage uses the largest step cost.
 const MATERIAL_MAX_BY_STAGE = {
   1: 30, 2: 50, 3: 70, 4: 100, 5: 100,
-  6: 30, 7: 40, 8: 50, 9: 60, 10: 60
+  6: 30, 7: 40, 8: 50, 9: 60, 10: 0
 };
 
 function formatNumber(value) {
@@ -168,9 +168,18 @@ if (hasDOM) {
   function updateMaterialLimit(stage) {
     const max = MATERIAL_MAX_BY_STAGE[stage] ?? 0;
     materialSlider.max = String(max);
+    materialSlider.disabled = stage === 10;
+    materialDecrease.disabled = stage === 10;
+    materialIncrease.disabled = stage === 10;
     materialMaxLabel.textContent = `최대 ${formatNumber(max)}개`;
     materialUnit.textContent = stage >= 6 ? "· 초월영혼석" : "· 영혼석";
-    setMaterialValue(materialSlider.value);
+    // Ascension ★5 is the final stage: no leftover material is selectable.
+    setMaterialValue(stage === 10 ? 0 : materialSlider.value);
+    if (stage === 10) {
+      materialSlider.disabled = true;
+      materialDecrease.disabled = true;
+      materialIncrease.disabled = true;
+    }
   }
 
   function selectGrade(value) {
