@@ -91,3 +91,32 @@ footer { text-align: center; padding: 10px 20px 30px; color: var(--muted); font-
   .star-button { padding: 6px 0; border-radius: 0; }
 }
 .star-divider { display: block; width: 100%; min-height: 1px; }
+
+/* Compact star row: keep each group close, with a clear break between ★5 and ★1A. */
+.star-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+}
+.star-button {
+  flex: 0 0 clamp(18px, 2.6vw, 28px);
+  width: clamp(18px, 2.6vw, 28px);
+  min-width: 0;
+  padding: 2px 0;
+  margin: 0;
+  font-size: clamp(1.25rem, 3.1vw, 1.8rem);
+}
+.star-button:nth-child(6) {
+  margin-left: clamp(12px, 2.8vw, 24px);
+}
+@media (max-width: 480px) {
+  .star-buttons { gap: 0; }
+  .star-button {
+    flex-basis: clamp(18px, 5.5vw, 23px);
+    width: clamp(18px, 5.5vw, 23px);
+    padding: 2px 0;
+  }
+  .star-button:nth-child(6) { margin-left: 12px; }
+}
