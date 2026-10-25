@@ -74,19 +74,19 @@ footer { text-align: center; padding: 10px 20px 30px; color: var(--muted); font-
   button { width: 100%; margin-right: 0; }
 }
 .field-label { font-weight: 700; }
-.star-picker { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: #fcfbff; }
+.star-picker { padding: 6px 0; background: transparent; }
 .star-buttons { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; }
-.star-button { margin: 0; padding: 8px 0; min-width: 0; background: #eeebf4; color: #b8b4c1; font-size: clamp(1rem, 3vw, 1.7rem); line-height: 1.3; transition: background .15s ease, color .15s ease, transform .15s ease, box-shadow .15s ease; }
-.star-button:hover { transform: translateY(-2px); background: #e5def7; }
-/* Selected progression stars turn bright gold; the current star gets a clear outline. */
-.star-button.selected { background: #fff0b8; color: #e6a400; text-shadow: 0 1px 0 rgba(120, 76, 0, .12); }
-.star-button.current { box-shadow: inset 0 0 0 2px #d18b00; background: #ffda65; color: #8b5600; }
+.star-button { margin: 0; padding: 5px 0; min-width: 0; border: 0; border-radius: 0; background: transparent; color: #c8c5ce; font-size: clamp(1.25rem, 3.5vw, 2rem); line-height: 1.3; text-align: center; transition: color .15s ease, transform .15s ease, filter .15s ease; }
+.star-button:hover { transform: translateY(-2px) scale(1.08); background: transparent; }
+/* Only the star glyph changes color: selected stars through the current grade turn yellow. */
+.star-button.selected { background: transparent; color: #f2b900; text-shadow: 0 1px 0 rgba(120, 76, 0, .12); }
+.star-button.current { background: transparent; color: #f2b900; filter: drop-shadow(0 1px 0 rgba(160, 105, 0, .25)); }
 .star-button:focus-visible { outline: 3px solid #d8cbff; outline-offset: 2px; }
 .grade-caption { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 .grade-caption strong { color: var(--accent-dark); font-size: 1.05rem; }
 .grade-caption span { color: var(--muted); font-size: .86rem; }
 @media (max-width: 480px) {
-  .star-picker { padding: 8px; }
+  .star-picker { padding: 4px 0; }
   .star-buttons { gap: 3px; }
-  .star-button { padding: 7px 0; border-radius: 7px; }
+  .star-button { padding: 6px 0; border-radius: 0; }
 }
