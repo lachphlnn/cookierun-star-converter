@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#6846c7">
   <title>쿠키런: 킹덤 6성 전환 계산기</title>
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
   <header class="site-header">
@@ -43,14 +43,15 @@
         </div>
 
         <div class="field">
-          <label for="ownedMaterial">현재 남은 재료 수량</label>
-          <div class="material-value-row">
-            <input id="ownedMaterial" name="ownedMaterial" type="number" min="0" max="100" step="1" value="0" inputmode="numeric" aria-describedby="material-help material-max-label">
-            <span class="material-unit" id="material-unit">영혼석</span>
-          </div>
+          <label for="ownedMaterialSlider">현재 남은 재료 수량 <span class="material-unit" id="material-unit">영혼석</span></label>
           <input id="ownedMaterialSlider" class="material-slider" type="range" min="0" max="100" step="1" value="0" aria-label="현재 남은 재료 수량 슬라이더" aria-describedby="material-help">
           <div class="slider-scale"><span>0</span><strong id="material-max-label">최대 100개</strong></div>
-          <small id="material-help">슬라이더를 움직이거나 숫자 입력란의 위·아래 화살표로 1개씩 조정할 수 있어요. 현재 단계의 승급 재료량을 기준으로 최대값이 바뀝니다.</small>
+          <div class="material-stepper" aria-label="재료 수량 한 개씩 조절">
+            <button class="stepper-button" id="material-decrease" type="button" aria-label="재료 수량 1개 줄이기" title="1개 줄이기">▼</button>
+            <output id="material-count" class="material-count" aria-live="polite">0개</output>
+            <button class="stepper-button" id="material-increase" type="button" aria-label="재료 수량 1개 늘리기" title="1개 늘리기">▲</button>
+          </div>
+          <small id="material-help">슬라이더 또는 화살표로 수량을 조절할 수 있어요. 최대 수량은 현재 단계에 따라 바뀝니다.</small>
         </div>
         <div class="button-row">
           <button class="primary" type="submit">전환 결과 계산</button>
@@ -90,6 +91,6 @@
     </section>
   </main>
   <footer>팬 제작 비공식 도구 · 데브시스터즈와 제휴·승인 관계가 없습니다.</footer>
-  <script src="app.js?v=13"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>

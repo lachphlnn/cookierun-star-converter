@@ -211,3 +211,15 @@ input.material-slider[type="range"]::-moz-range-thumb {
 }
 .slider-scale { display: flex; align-items: center; justify-content: space-between; margin-top: -2px; color: var(--muted); font-size: .82rem; }
 .slider-scale strong { font-weight: 700; }
+
+/* Slider-only material control with a compact count and one-step arrow buttons. */
+.field label .material-unit { font-weight: 500; }
+input.material-slider[type="range"] { background: linear-gradient(to right, var(--accent) 0%, var(--accent) 0%, #e7e2f1 0%, #e7e2f1 100%); }
+input.material-slider[type="range"]::-webkit-slider-runnable-track { background: transparent; border-color: transparent; }
+input.material-slider[type="range"]::-moz-range-track { background: transparent; border-color: transparent; }
+.material-stepper { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 0; }
+.material-count { min-width: 52px; text-align: center; color: var(--muted); font-size: .82rem; font-weight: 600; }
+.stepper-button { display: inline-flex; align-items: center; justify-content: center; width: 30px; min-height: 26px; padding: 2px 6px; margin: 0; border: 1px solid #ddd5ee; border-radius: 7px; background: #f5f1fc; color: var(--accent-dark); font-size: .68rem; line-height: 1; }
+.stepper-button:hover:not(:disabled) { background: #e9e0fc; }
+.stepper-button:disabled { opacity: .35; cursor: not-allowed; }
+@media (max-width: 620px) { .stepper-button { width: 30px; margin: 0; } }

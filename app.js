@@ -109,15 +109,21 @@ function showResult(input, result) {
   const nextGrade = Math.min(result.finalGrade + 1, thresholds.length - 1);
   const nextThreshold = thresholds[nextGrade];
   const isMaxGrade = result.finalGrade >= thresholds.length - 1;
-  const progress = isMaxGrade
+  const segmentSize = isMaxGrade ? 0 : nextThreshold - currentThreshold;
+  const progressCount = isMaxGrade
+    ? currentThreshold
+    : Math.max(0, Math.min(segmentSize, result.convertedSoulstones - currentThreshold));
+  const progress = isMaxGrade || segmentSize === 0
     ? 100
-    : Math.max(0, Math.min(100, ((result.convertedSoulstones - currentThreshold) / (nextThreshold - currentThreshold)) * 100));
+    : Math.max(0, Math.min(100, (progressCount / segmentSize) * 100));
   const needed = isMaxGrade ? 0 : Math.max(0, nextThreshold - result.convertedSoulstones);
 
   const progressBar = document.getElementById("grade-progress");
   progressBar.setAttribute("aria-valuenow", String(Math.round(progress)));
   document.getElementById("grade-progress-fill").style.width = `${progress}%`;
-  document.getElementById("progress-percent").textContent = isMaxGrade ? "최고 성급" : `${Math.round(progress)}%`;
+  document.getElementById("progress-percent").textContent = isMaxGrade
+    ? `${formatNumber(currentThreshold)} / ${formatNumber(currentThreshold)}개`
+    : `${formatNumber(progressCount)} / ${formatNumber(segmentSize)}개`;
   document.getElementById("progress-needed").textContent = isMaxGrade
     ? "더 높은 성급이 없습니다."
     : needed === 0
@@ -133,20 +139,38 @@ function showResult(input, result) {
 
 if (hasDOM) {
   const gradeInput = document.getElementById("grade");
-  const materialInput = document.getElementById("ownedMaterial");
   const materialSlider = document.getElementById("ownedMaterialSlider");
   const materialUnit = document.getElementById("material-unit");
   const materialMaxLabel = document.getElementById("material-max-label");
+  const materialCount = document.getElementById("material-count");
+  const materialDecrease = document.getElementById("material-decrease");
+  const materialIncrease = document.getElementById("material-increase");
+
+  function updateMaterialDisplay() {
+    const value = Number(materialSlider.value) || 0;
+    const max = Number(materialSlider.max) || 0;
+    const percentage = max > 0 ? (value / max) * 100 : 0;
+    materialCount.textContent = `${formatNumber(value)}개`;
+    materialDecrease.disabled = value <= 0;
+    materialIncrease.disabled = value >= max;
+    materialSlider.style.background = `linear-gradient(to right, var(--accent) 0%, var(--accent) ${percentage}%, #e7e2f1 ${percentage}%, #e7e2f1 100%)`;
+    materialSlider.style.backgroundRepeat = "no-repeat";
+    materialSlider.style.backgroundSize = "100% 8px";
+    materialSlider.style.backgroundPosition = "center";
+  }
+
+  function setMaterialValue(value) {
+    const max = Number(materialSlider.max) || 0;
+    materialSlider.value = String(Math.max(0, Math.min(max, Math.trunc(Number(value) || 0))));
+    updateMaterialDisplay();
+  }
 
   function updateMaterialLimit(stage) {
     const max = MATERIAL_MAX_BY_STAGE[stage] ?? 0;
-    materialInput.max = String(max);
     materialSlider.max = String(max);
     materialMaxLabel.textContent = `최대 ${formatNumber(max)}개`;
-    materialUnit.textContent = stage >= 6 ? "초월영혼석" : "영혼석";
-    const current = Math.max(0, Math.min(max, Number(materialInput.value) || 0));
-    materialInput.value = String(current);
-    materialSlider.value = String(current);
+    materialUnit.textContent = stage >= 6 ? "· 초월영혼석" : "· 영혼석";
+    setMaterialValue(materialSlider.value);
   }
 
   function selectGrade(value) {
@@ -182,32 +206,16 @@ if (hasDOM) {
   }
   selectGrade(Number(gradeInput.value));
 
-  materialInput.addEventListener("input", () => {
-    const max = Number(materialInput.max) || 0;
-    const raw = materialInput.value.trim();
-    if (raw === "") {
-      materialSlider.value = "0";
-      return;
-    }
-    const value = Math.max(0, Math.min(max, Math.trunc(Number(raw) || 0)));
-    materialSlider.value = String(value);
-  });
-  materialInput.addEventListener("change", () => {
-    const max = Number(materialInput.max) || 0;
-    const value = Math.max(0, Math.min(max, Math.trunc(Number(materialInput.value) || 0)));
-    materialInput.value = String(value);
-    materialSlider.value = String(value);
-  });
-  materialSlider.addEventListener("input", () => {
-    materialInput.value = materialSlider.value;
-  });
+  materialSlider.addEventListener("input", updateMaterialDisplay);
+  materialDecrease.addEventListener("click", () => setMaterialValue(Number(materialSlider.value) - 1));
+  materialIncrease.addEventListener("click", () => setMaterialValue(Number(materialSlider.value) + 1));
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     try {
       const input = {
         grade: Number(gradeInput.value),
-        ownedMaterial: readNonNegativeInteger("ownedMaterial")
+        ownedMaterial: Number(materialSlider.value) || 0
       };
       showResult(input, calculateConversion(input));
     } catch (error) {
@@ -216,23 +224,11 @@ if (hasDOM) {
   });
   form.addEventListener("reset", () => {
     window.setTimeout(() => {
-      materialInput.value = "0";
-      materialSlider.value = "0";
+      setMaterialValue(0);
       selectGrade(5);
       results.hidden = true;
     }, 0);
   });
-}
-
-function readNonNegativeInteger(id) {
-  const raw = document.getElementById(id).value.trim();
-  // An empty field means zero remaining materials.
-  if (raw === "") return 0;
-  const value = Number(raw);
-  if (!Number.isSafeInteger(value) || value < 0) {
-    throw new Error("보유 재료는 0 이상의 정수로 입력해 주세요.");
-  }
-  return value;
 }
 
 if (typeof module !== "undefined" && module.exports) {
