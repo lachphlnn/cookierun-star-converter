@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "description": "Only official conversion rules verified from update notices are included. Promotion thresholds are intentionally omitted until verified.",
+  "cookies": [
+    {
+      "id": "wind_archer",
+      "nameKo": "바람궁수 쿠키",
+      "status": "official_conversion_rule_verified",
+      "officialNotice": "https://hub.cookierun-kingdom.com/ko/news/updates/july-2-update-notice",
+      "conversionRate": 1.2,
+      "rounding": "ceil",
+      "choiceChestThreshold": 450,
+      "choiceChestKinds": 9,
+      "gradeThresholds": null
+    },
+    {
+      "id": "moonlight",
+      "nameKo": "달빛술사 쿠키",
+      "status": "official_conversion_rule_verified",
+      "officialNotice": "https://hub.cookierun-kingdom.com/news/updates/october-21-update-notice",
+      "conversionRate": 1.2,
+      "rounding": "ceil",
+      "choiceChestThreshold": 450,
+      "choiceChestKinds": 10,
+      "gradeThresholds": null
+    }
+  ]
+}
