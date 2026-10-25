@@ -24,6 +24,14 @@ const form = hasDOM ? document.getElementById("calculator-form") : null;
 const results = hasDOM ? document.getElementById("results") : null;
 const gradeButtons = hasDOM ? [...document.querySelectorAll("[data-grade]")] : [];
 
+// Maximum remaining materials available on the slider for each selected stage.
+// Normal grades use the next Soulstone promotion cost; ascension grades use
+// the next Soulcore promotion cost. The final stage uses the largest step cost.
+const MATERIAL_MAX_BY_STAGE = {
+  1: 30, 2: 50, 3: 70, 4: 100, 5: 100,
+  6: 30, 7: 40, 8: 50, 9: 60, 10: 60
+};
+
 function formatNumber(value) {
   return new Intl.NumberFormat("ko-KR").format(value);
 }
@@ -125,8 +133,25 @@ function showResult(input, result) {
 
 if (hasDOM) {
   const gradeInput = document.getElementById("grade");
+  const materialInput = document.getElementById("ownedMaterial");
+  const materialSlider = document.getElementById("ownedMaterialSlider");
+  const materialUnit = document.getElementById("material-unit");
+  const materialMaxLabel = document.getElementById("material-max-label");
+
+  function updateMaterialLimit(stage) {
+    const max = MATERIAL_MAX_BY_STAGE[stage] ?? 0;
+    materialInput.max = String(max);
+    materialSlider.max = String(max);
+    materialMaxLabel.textContent = `최대 ${formatNumber(max)}개`;
+    materialUnit.textContent = stage >= 6 ? "초월영혼석" : "영혼석";
+    const current = Math.max(0, Math.min(max, Number(materialInput.value) || 0));
+    materialInput.value = String(current);
+    materialSlider.value = String(current);
+  }
+
   function selectGrade(value) {
     gradeInput.value = String(value);
+    updateMaterialLimit(value);
     gradeButtons.forEach((button) => {
       const buttonGrade = Number(button.dataset.grade);
       const selected = buttonGrade <= value;
@@ -157,6 +182,26 @@ if (hasDOM) {
   }
   selectGrade(Number(gradeInput.value));
 
+  materialInput.addEventListener("input", () => {
+    const max = Number(materialInput.max) || 0;
+    const raw = materialInput.value.trim();
+    if (raw === "") {
+      materialSlider.value = "0";
+      return;
+    }
+    const value = Math.max(0, Math.min(max, Math.trunc(Number(raw) || 0)));
+    materialSlider.value = String(value);
+  });
+  materialInput.addEventListener("change", () => {
+    const max = Number(materialInput.max) || 0;
+    const value = Math.max(0, Math.min(max, Math.trunc(Number(materialInput.value) || 0)));
+    materialInput.value = String(value);
+    materialSlider.value = String(value);
+  });
+  materialSlider.addEventListener("input", () => {
+    materialInput.value = materialSlider.value;
+  });
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     try {
@@ -170,7 +215,12 @@ if (hasDOM) {
     }
   });
   form.addEventListener("reset", () => {
-    window.setTimeout(() => { selectGrade(5); results.hidden = true; }, 0);
+    window.setTimeout(() => {
+      materialInput.value = "0";
+      materialSlider.value = "0";
+      selectGrade(5);
+      results.hidden = true;
+    }, 0);
   });
 }
 
@@ -186,5 +236,5 @@ function readNonNegativeInteger(id) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { COOKIE_RULES, calculateConversion, stageLabel };
+  module.exports = { COOKIE_RULES, MATERIAL_MAX_BY_STAGE, calculateConversion, stageLabel };
 }
